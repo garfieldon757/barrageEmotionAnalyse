@@ -1,12 +1,11 @@
 var fs = require('fs'),
     rd = require('readline'),
-    xml2js = require('xml2js');
+    xml2js = require('xml2js'),
     util = require('util');
     nodejieba = require("nodejieba");
 
 
-var s = "我不喜欢你";
-calSentScore(s);
+
 
 var barrageArr = [];
 
@@ -69,12 +68,13 @@ function calSentScore(sentence){
     });
 
     //对sentence分词
-    // var segWords = cutWords("我非常不喜欢你");
-    // console.log(segWords);
+    var segWords = ["我","非常","不","喜欢","你",];//cutWords(sentence);
 
     //根据词典计算情感值
+    var sentenceSentimentScore = sentimentCalculate(dicObj, segWords);
 
-
+    //打印
+    printScore(sentenceSentimentScore);
 }
 
 function readDic2Obj(dicObj, callback){
@@ -156,3 +156,87 @@ function readDic2Obj(dicObj, callback){
         callback(dicObj);
     }, 1000);
 }
+
+function sentimentCalculate(dicObj, segWords){
+
+    var posScore = 0,
+        negScore = 0.
+        wordsLen = segWords.length;
+
+    for(index in segWords){
+        var word = segWords[index],
+            preWord = segWords[index-1],
+            prePreWord = segWords[index-2];
+        var levelArr = Object.keys(dicObj.levelHashmap);
+
+        if(dicObj.posSentimentArr.indexof(word) != -1 
+            && dicObj.negSentimentArr.indexof(word) != -1){
+            
+            //单个前缀
+            if(i-1>=0 && i-2<0){
+                if( dicObj.denyArr.indexof(preWord) ){
+                    if( dicObj.posSentimentArr.indexof(word) ){
+                        negScore += 1;
+                    }else{
+                        posScore += 1;
+                    }
+                }
+            }
+
+            //双前缀
+            if(i-1>=0 && i-2>=0){
+            
+                // 双重否定
+                if( dicObj.negSentimentArr.indexof(prePreWord) != -1  
+                    && dicObj.negSentimentArr.indexof(preWord) != -1){
+                        if( dicObj.posSentimentArr.indexof(word) != -1 ){
+                            posScore += 1;
+                        }else{
+                            negScore += 1;
+                        }
+                }
+    
+                // 程度副词(-2) 否定词(-1)
+                if( levelArr.indexof(prePreWord) != -1 
+                    && dicObj.denyArr.indexof(preWord) != -1 ){
+                    if( dicObj.posSentimentArr.indexof(word) != -1 ){
+                        posScore += 1;
+                    }else{
+                        negScore += 1;
+                    }
+                }
+    
+                // 否定词(-2) 程度副词(-1)
+                if( dicObj.denyArr.indexof(prePreWord) != -1 
+                        && levelArr.indexof(preWord) != -1 ){
+                    if( dicObj.posSentimentArr.indexof(word) != -1 ){
+                        posScore += 1;
+                    }else{
+                        negScore += 1;
+                    }
+                }
+    
+            }
+
+
+        }
+
+    }
+
+    var scoreObj = {};
+    scoreObj.posScore = posScore;
+    scoreObj.negScore = -negScore;
+    scoreObj.wordsLen = wordsLen;
+
+    return scoreObj;
+
+}
+
+function printScore(score){
+    console.log("正面情感得分：" + score.posScore + "分");
+    console.log("负面情感得分：" + score.negScore + "分");
+    console.log("该弹幕含有单词数：" + socre.wordsLen + "个");
+}
+
+var s = "";
+calSentScore(s);
