@@ -28,7 +28,8 @@ var barragePreProcessUtil = {
                     
                                 //按时间排序输出
                                 barrageArr = barragePreProcessUtil.sortedByTimestamps(barrageArr);
-                                console.log(util.inspect(barrageArr,false,null));
+                                var hotTimezoneArr = barragePreProcessUtil.recongnizeHotTimezone(barrageArr);
+                                console.log(util.inspect(hotTimezoneArr,false,null));
                             })
                         }
                     );
@@ -46,7 +47,70 @@ var barragePreProcessUtil = {
                                                 return Number(barrage1.timeStamp) - Number(barrage2.timeStamp);
                                             });
                             return barrageArr;
-                        }
+                        },
+    recongnizeHotTimezone : function(barrageArr){
+
+        //计算平均每秒弹幕数量
+        var videoLen = Number.parseInt(barrageArr[barrageArr.length - 1].timeStamp);
+        var avgBarrageNum = barrageArr.length / videoLen;
+        //新建每秒弹幕数量arr
+        var barrageNumArr = [];
+        var numPerSecObj = {};
+        function numPerSecInit(){
+            return {
+                timeStamp : 0,
+                num : 0
+            };
+        };
+        for(var i in barrageArr){
+            if(i==0){
+                numPerSecObj = new numPerSecInit();
+                numPerSecObj.timeStamp = 0
+                numPerSecObj.num += 1;
+            }else{
+                if( Number.parseInt(barrageArr[i].timeStamp)==Number.parseInt(barrageArr[i-1].timeStamp)){
+                    numPerSecObj.num += 1;
+                }else{
+                    barrageNumArr.push( numPerSecObj );
+                    
+                    numPerSecObj = new numPerSecInit();
+                    numPerSecObj.timeStamp = Number.parseInt(barrageArr[i].timeStamp);
+                    numPerSecObj.num = 1;
+                }
+            }
+            
+        }
+        //识别弹幕数量高于平均弹幕数的区间
+        var hotTimezoneArr = [];
+        function hotTimezoneInit(){
+            return {
+                startTimeStamp : 0,
+                endTimeStamp : 0,
+                num : 0
+            };
+        }
+        var hotTimezone = {},
+            newTimezoneFlag = false;
+        for(var i in barrageNumArr){
+            if(barrageNumArr[i].num>avgBarrageNum && !newTimezoneFlag){
+                newTimezoneFlag = true;
+                hotTimezone = new hotTimezoneInit();
+                hotTimezone.startTimeStamp = Number.parseInt(i);
+                hotTimezone.num += barrageNumArr[i].num;
+            }else if(barrageNumArr[i].num>avgBarrageNum && newTimezoneFlag){
+                hotTimezone.num += barrageNumArr[i].num;
+            }else if(barrageNumArr[i].num<avgBarrageNum && newTimezoneFlag){
+                newTimezoneFlag = false;
+                hotTimezone.endTimeStamp = Number.parseInt(i);
+                hotTimezoneArr.push(hotTimezone);
+            }else if(barrageNumArr[i].num<avgBarrageNum && !newTimezoneFlag){
+                //nothing
+            }
+        }
+
+        return hotTimezoneArr;
+    }
+                    
 };
 
 var sentimentalAnalyseUtil = {
@@ -270,15 +334,17 @@ function sentimentalAnalyse(sentence){
 
 
 //测试
-var testSentenceArr = {
-    s1 : "我一点儿也不喜欢吃饭了",
-    s2 : "我不太喜欢吃饭了",
-    s3 : "我极其不喜欢吃饭了",
-    s4 : "我不讨厌上课",
-    s5 : "我不爱上课",
-    s6 : "我既不爱上课，又不爱吃饭？更不爱哈哈"
-};
+// var testSentenceArr = {
+//     s1 : "我一点儿也不喜欢吃饭了",
+//     s2 : "我不太喜欢吃饭了",
+//     s3 : "我极其不喜欢吃饭了",
+//     s4 : "我不讨厌上课",
+//     s5 : "我不爱上课",
+//     s6 : "我既不爱上课，又不爱吃饭？更不爱哈哈"
+// };
 
-for(var i in testSentenceArr){
-    sentimentalAnalyse(testSentenceArr[i]);
-}
+// for(var i in testSentenceArr){
+//     sentimentalAnalyse(testSentenceArr[i]);
+// }
+
+barragePreProcessUtil.preProcess();
