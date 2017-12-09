@@ -14,10 +14,36 @@ var barragePreProcessUtil = {
                             return result;
     },
     sortedByTimestamps : function(barrageArr){
-                            var barrageArr = barrageArr.sort(function(barrage1, barrage2){
-                                                return Number(barrage1.timeStamp) - Number(barrage2.timeStamp);
-                                            });
-                            return barrageArr;
+        var barrageArr = barrageArr.sort(function(barrage1, barrage2){
+                            return Number(barrage1.timeStamp) - Number(barrage2.timeStamp);
+                        });
+        return barrageArr;
+    },
+    sortedByfrequency : function(keywordsObj){
+
+        //obj转换成数组
+        var keywordsArr = [];
+        
+        for(var i in keywordsObj){
+            var keywordObj = {};
+            keywordObj.word = i;
+            keywordObj.num  = keywordsObj[i];
+            keywordsArr.push(keywordObj);
+        }
+        //排序
+        keywordsArr = keywordsArr.sort(function(keyword1, keyword2){
+            var key1,key2,value1,value2;
+            for(var i in keyword1){
+                key1 = i;
+                value1 = keyword1[i];
+            }
+            for(var j in keyword2){
+                key2 = j;
+                value2 = keyword2[j];
+            }
+            return Number(value2) - Number(value1);
+        });
+        return keywordsArr;
     },
     recongnizeHotTimezone : function(barrageArr){
 
@@ -240,9 +266,9 @@ function SubjSentenceRecognition(sentence, resultObj){
     var sentenceSentimentScore = sentimentalAnalyseUtil.sentimentScoreCalculate(dicObj, segWords);
     //根据情感值对主客观弹幕分类
     if(sentenceSentimentScore.score != 0)
-        resultObj.posBarrageArr.push(sentence);
+        resultObj.subjectiveBarrageArr.push(sentence);
     else
-        resultObj.negBarrageArr.push(sentence);
+        resultObj.objectiveBarrageArr.push(sentence);
     
 }
 
@@ -277,13 +303,36 @@ function sentimentalAnalyse(sentence){
 // };
 
 var testSentenceArr = preProcess('./jinkela.xml');
+
+
+//第一步：弹幕主客观分类，写入barrageClassifyResult.json
 var sentimentalClassifierObj = {
-    posBarrageArr : [],
-    negBarrageArr : []
+    subjectiveBarrageArr : [],
+    objectiveBarrageArr : []
 };
 
 for(var i in testSentenceArr){
     SubjSentenceRecognition(testSentenceArr[i].content, sentimentalClassifierObj);
 }
 
-console.log(util.inspect(sentimentalClassifierObj, false, null));
+var sentimentalClassifierJSON = JSON.stringify(sentimentalClassifierObj, null, 2);
+fs.writeFileSync('./barrageClassifyResult.json', sentimentalClassifierJSON);
+
+//第二步：对主观弹幕做情感向量分析
+
+//第三步：对客观弹幕做高频词排名
+var objectiveBarrageArr = sentimentalClassifierObj.objectiveBarrageArr;
+var objectiveKeywordsArr = {};
+for(var i in objectiveBarrageArr){
+    var keywords = barragePreProcessUtil.extractKeywords(objectiveBarrageArr[i],3);
+    for(var j in keywords){
+        if(objectiveKeywordsArr[ keywords[j].word ])
+            objectiveKeywordsArr[ keywords[j].word ] += 1;
+        else
+            objectiveKeywordsArr[ keywords[j].word ] = 1;
+    }
+}
+objectiveKeywordsArr = barragePreProcessUtil.sortedByfrequency(objectiveKeywordsArr);
+// console.log(util.inspect(objectiveKeywordsArr, false, null));
+var objectiveKeywordsJSON = JSON.stringify(objectiveKeywordsArr, null, 2);
+fs.writeFileSync('./keywordsExtractResult.json', objectiveKeywordsJSON);
