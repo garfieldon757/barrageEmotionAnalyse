@@ -1,4 +1,5 @@
 var fs = require('fs'),
+    path = require('path'),
     rd = require('readline'),
     xml2js = require('xml2js'),
     util = require('util');
@@ -22,6 +23,9 @@ var barragePreProcessUtil = {
     sortedByfrequency : function(keywordsObj){
 
         //obj转换成数组
+        /**
+         * 格式: {10:1,6666:2,...}
+         */
         var keywordsArr = [];
         
         for(var i in keywordsObj){
@@ -31,6 +35,9 @@ var barragePreProcessUtil = {
             keywordsArr.push(keywordObj);
         }
         //排序
+        /**
+         * 格式 [{word:'10',num:1},{word:'6666',num:2}...]
+         */
         keywordsArr = keywordsArr.sort(function(keyword1, keyword2){
             var key1,key2,value1,value2;
             for(var i in keyword1){
@@ -106,7 +113,17 @@ var barragePreProcessUtil = {
         }
 
         return hotTimezoneArr;
-    }             
+    },
+    unloggedWordRecognize : function(sentence){
+    },
+    traversalXmlInDir : function(dir, callback){
+        fs.readdirSync(dir).forEach(function(file){
+            if(file.indexOf('.xml')!=-1){
+                var filePath = path.join(dir, file);
+                callback(filePath);
+            }
+        });
+    }
 };
 
 var sentimentalAnalyseUtil = {
@@ -129,16 +146,26 @@ var sentimentalAnalyseUtil = {
                                 if(dicObj.posSentimentArr.indexOf(word) != -1 
                                     || dicObj.negSentimentArr.indexOf(word) != -1){
                                     
-                                    //单个前缀  --暂时没用
-                                    // if(index-1>=0 && index-2<0){
-                                    //     if( dicObj.denyArr.indexOf(preWord) ){
-                                    //         if( dicObj.posSentimentArr.indexOf(word) ){
-                                    //             score -= 1;
-                                    //         }else{
-                                    //             score += 1;
-                                    //         }
-                                    //     }
-                                    // }
+                                    // 单个前缀  --暂时没用
+                                    if(index-1>=0 && index-2<0){
+                                        if( dicObj.denyArr.indexOf(preWord) != -1){
+
+                                            if( dicObj.posSentimentArr.indexOf(word) != -1 ){
+                                                score -= 1;
+                                            }else{
+                                                score += 1;
+                                            }
+
+                                        }else{
+
+                                            if( dicObj.posSentimentArr.indexOf(word) != -1 ){
+                                                score += 1;
+                                            }else{
+                                                score -= 1;
+                                            }
+
+                                        }
+                                    }
                         
                                     //双前缀
                                     if(index-1>=0 && index-2>=0){
@@ -265,10 +292,13 @@ function SubjSentenceRecognition(sentence, resultObj){
     //根据词典计算情感值
     var sentenceSentimentScore = sentimentalAnalyseUtil.sentimentScoreCalculate(dicObj, segWords);
     //根据情感值对主客观弹幕分类
-    if(sentenceSentimentScore.score != 0)
-        resultObj.subjectiveBarrageArr.push(sentence);
-    else
-        resultObj.objectiveBarrageArr.push(sentence);
+    var sentenceObj = {};
+    sentenceObj.content = sentence;
+    if(sentenceSentimentScore.score != 0){
+        resultObj.subjectiveBarrageArr.push(sentenceObj);
+    }else{
+        resultObj.objectiveBarrageArr.push(sentenceObj);
+    }
     
 }
 
@@ -284,8 +314,8 @@ function sentimentalAnalyse(sentence){
     //根据词典计算情感值
     var sentenceSentimentScore = sentimentalAnalyseUtil.sentimentScoreCalculate(dicObj, segWords);
     //打印
-    sentimentalAnalyseUtil.printSentimentScore(sentenceSentimentScore, sentence);
-    
+    // sentimentalAnalyseUtil.printSentimentScore(sentenceSentimentScore, sentence);
+    return sentenceSentimentScore.score;
 }
 
 
@@ -301,8 +331,15 @@ function sentimentalAnalyse(sentence){
 //     s8 : "火钳刘明",
 //     s9 : "红黄蓝"
 // };
-
-var testSentenceArr = preProcess('./jinkela.xml');
+// var barrageFileArr = ['./barrageFile/negSent.xml','./barrageFile/你可见过如此凶残的练习曲.xml',
+//                     './barrageFile/辞去已无年少日，羁绊永结少年心！.xml','./barrageFile/德国骨科：这有个妹控搞事情，非要妹妹再哄他一次！.xml',
+//                     './barrageFile/butterfly完美含泪重制版，2015年再见！！！！.xml','./barrageFile/假如鬼畜终将逝去.xml',
+//                     './barrageFile/震撼心灵反思抑郁症短片《生为何故》.xml','./barrageFile/没有黄段子存在的无聊世界 01【独家正版】.xml',];
+var barrageFileArr = [];
+barragePreProcessUtil.traversalXmlInDir('./barragefile/', function(path){
+    barrageFileArr.push(path);
+});
+var testSentenceArr = null;
 
 
 //第一步：弹幕主客观分类，写入barrageClassifyResult.json
@@ -311,28 +348,48 @@ var sentimentalClassifierObj = {
     objectiveBarrageArr : []
 };
 
-for(var i in testSentenceArr){
-    SubjSentenceRecognition(testSentenceArr[i].content, sentimentalClassifierObj);
+for(var index in barrageFileArr){
+    testSentenceArr = preProcess( barrageFileArr[index] );
+
+
+
+    for(var i in testSentenceArr){
+        SubjSentenceRecognition(testSentenceArr[i].content, sentimentalClassifierObj);
+    }
+    
+
 }
 
+//第二步：对主观弹幕做情感向量分析
+    
+var subjectiveBarrageArrLen = sentimentalClassifierObj.subjectiveBarrageArr.length;
+// var totalSentimentalValue = 0;
+for(var i in sentimentalClassifierObj.subjectiveBarrageArr){
+    var sentimentalValue = 0;
+    sentimentalValue = sentimentalAnalyse( sentimentalClassifierObj.subjectiveBarrageArr[i].content );
+    sentimentalClassifierObj.subjectiveBarrageArr[i].sentScore = sentimentalValue;
+    // totalSentimentalValue += sentimentalValue.score;
+}
+// var avgSentimentalValue = totalSentimentalValue/subjectiveBarrageArrLen;
 var sentimentalClassifierJSON = JSON.stringify(sentimentalClassifierObj, null, 2);
 fs.writeFileSync('./barrageClassifyResult.json', sentimentalClassifierJSON);
 
-//第二步：对主观弹幕做情感向量分析
 
 //第三步：对客观弹幕做高频词排名
-var objectiveBarrageArr = sentimentalClassifierObj.objectiveBarrageArr;
-var objectiveKeywordsArr = {};
-for(var i in objectiveBarrageArr){
-    var keywords = barragePreProcessUtil.extractKeywords(objectiveBarrageArr[i],3);
-    for(var j in keywords){
-        if(objectiveKeywordsArr[ keywords[j].word ])
-            objectiveKeywordsArr[ keywords[j].word ] += 1;
-        else
-            objectiveKeywordsArr[ keywords[j].word ] = 1;
-    }
-}
-objectiveKeywordsArr = barragePreProcessUtil.sortedByfrequency(objectiveKeywordsArr);
-// console.log(util.inspect(objectiveKeywordsArr, false, null));
-var objectiveKeywordsJSON = JSON.stringify(objectiveKeywordsArr, null, 2);
-fs.writeFileSync('./keywordsExtractResult.json', objectiveKeywordsJSON);
+// var objectiveBarrageArr = sentimentalClassifierObj.objectiveBarrageArr;
+// var objectiveKeywordsArr = {};
+// for(var i in objectiveBarrageArr){
+//     var keywords = barragePreProcessUtil.extractKeywords(objectiveBarrageArr[i],3);
+//     for(var j in keywords){
+//         if(objectiveKeywordsArr[ keywords[j].word ])
+//             objectiveKeywordsArr[ keywords[j].word ] += 1;
+//         else
+//             objectiveKeywordsArr[ keywords[j].word ] = 1;
+//     }
+// }
+// objectiveKeywordsArr = barragePreProcessUtil.sortedByfrequency(objectiveKeywordsArr);
+// var objectiveKeywordsJSON = JSON.stringify(objectiveKeywordsArr, null, 2);
+// fs.writeFileSync('./keywordsExtractResult.json', objectiveKeywordsJSON);
+
+//主观弹幕情感值和客观为登陆次映射
+// console.log(objectiveKeywordsArr[0].word + " 的情感值为：" +  avgSentimentalValue);
