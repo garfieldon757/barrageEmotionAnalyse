@@ -365,9 +365,15 @@ for(var index in barrageFileArr){
 var subjectiveBarrageArrLen = sentimentalClassifierObj.subjectiveBarrageArr.length;
 // var totalSentimentalValue = 0;
 for(var i in sentimentalClassifierObj.subjectiveBarrageArr){
+
     var sentimentalValue = 0;
-    sentimentalValue = sentimentalAnalyse( sentimentalClassifierObj.subjectiveBarrageArr[i].content );
+    var sentence = sentimentalClassifierObj.subjectiveBarrageArr[i].content;
+    var sentencePosTagArr = [];
+
+    sentimentalValue = sentimentalAnalyse( sentence );
     sentimentalClassifierObj.subjectiveBarrageArr[i].sentScore = sentimentalValue;
+    sentencePosTagArr = nodejieba.tag( sentence );
+    sentimentalClassifierObj.subjectiveBarrageArr[i].PosTagArr = sentencePosTagArr;
     // totalSentimentalValue += sentimentalValue.score;
 }
 // var avgSentimentalValue = totalSentimentalValue/subjectiveBarrageArrLen;
