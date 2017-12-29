@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="FreeICTCLAS">
+      <UniqueIdentifier>{58dcdae7-119c-4cf8-9d43-f7f5699952a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeICTCLAS\Segment">
+      <UniqueIdentifier>{bb0675ca-2fe5-4f8f-9793-4c87a89d2f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeICTCLAS\Tag">
+      <UniqueIdentifier>{34b7995d-e306-4616-a268-47dd1b3c2470}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeICTCLAS\Unknown">
+      <UniqueIdentifier>{cbd4bdf1-86f8-4600-b855-4e03e837d9d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeICTCLAS\Utility">
+      <UniqueIdentifier>{5ad6aba1-0a7e-46d8-aeeb-7d3e11cec996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LibSVM">
+      <UniqueIdentifier>{79c3d14b-d08c-4705-91b4-fb581286c0fe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Utility\ContextStat.cpp">
+      <Filter>FreeICTCLAS\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Utility\Dictionary.cpp">
+      <Filter>FreeICTCLAS\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Utility\Utility.cpp">
+      <Filter>FreeICTCLAS\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Unknown\UnknowWord.cpp">
+      <Filter>FreeICTCLAS\Unknown</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Tag\Span.cpp">
+      <Filter>FreeICTCLAS\Tag</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Segment\DynamicArray.cpp">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Segment\NShortPath.cpp">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Segment\Queue.cpp">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Segment\SegGraph.cpp">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\Segment\Segment.cpp">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeICTCLAS\FreeICTCLAS.cpp">
+      <Filter>FreeICTCLAS</Filter>
+    </ClCompile>
+    <ClCompile Include="CommentText.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Markup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Processing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LibSVM\svm.cpp">
+      <Filter>LibSVM</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FreeICTCLAS\Utility\ContextStat.h">
+      <Filter>FreeICTCLAS\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Utility\Dictionary.h">
+      <Filter>FreeICTCLAS\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Utility\Utility.h">
+      <Filter>FreeICTCLAS\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Unknown\UnknowWord.h">
+      <Filter>FreeICTCLAS\Unknown</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Tag\Span.h">
+      <Filter>FreeICTCLAS\Tag</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Segment\DynamicArray.h">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Segment\NShortPath.h">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Segment\Queue.h">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Segment\SegGraph.h">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\Segment\Segment.h">
+      <Filter>FreeICTCLAS\Segment</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeICTCLAS\FreeICTCLAS.h">
+      <Filter>FreeICTCLAS</Filter>
+    </ClInclude>
+    <ClInclude Include="CommentText.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Markup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Processing.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LibSVM\svm.h">
+      <Filter>LibSVM</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

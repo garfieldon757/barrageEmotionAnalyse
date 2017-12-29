@@ -1,0 +1,14 @@
+weight_book_bool_10%
+最优：c=1.0 g=0.0625 rate=79.5278
+weight_book_tf_10%
+最优：c=16.0 g=0.25 rate=80.2222
+weight_book_tfidf_10%
+最优：c=1.0 g=0.5 rate=81.2222
+weight_book_tfidf_15%
+最优：c=1.0 g=0.5 rate=81.3889
+weight_book_tfidf_20%
+最优：c=1.0 g=0.25 rate=81.0
+weight_dvd_10%
+最优：c=1.0 g=0.125 rate=83.1295
+weight_music_10%
+最优：c=1.0 g=0.0625 rate=81.1788
