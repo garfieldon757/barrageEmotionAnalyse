@@ -319,70 +319,95 @@ function sentimentalAnalyse(sentence){
 }
 
 
-//测试
-// var testSentenceArr = {
-//     s1 : "我一点儿也不喜欢吃饭了",
-//     s2 : "我不太喜欢吃饭了",
-//     s3 : "我极其不喜欢吃饭了",
-//     s4 : "我不讨厌上课",
-//     s5 : "我不爱上课",
-//     s6 : "我既不爱上课，又不爱吃饭？更不爱哈哈",
-//     s7 : "6666",
-//     s8 : "火钳刘明",
-//     s9 : "红黄蓝"
-// };
-// var barrageFileArr = ['./barrageFile/negSent.xml','./barrageFile/你可见过如此凶残的练习曲.xml',
-//                     './barrageFile/辞去已无年少日，羁绊永结少年心！.xml','./barrageFile/德国骨科：这有个妹控搞事情，非要妹妹再哄他一次！.xml',
-//                     './barrageFile/butterfly完美含泪重制版，2015年再见！！！！.xml','./barrageFile/假如鬼畜终将逝去.xml',
-//                     './barrageFile/震撼心灵反思抑郁症短片《生为何故》.xml','./barrageFile/没有黄段子存在的无聊世界 01【独家正版】.xml',];
-var barrageFileArr = [];
-barragePreProcessUtil.traversalXmlInDir('./barragefile/', function(path){
-    barrageFileArr.push(path);
-});
-var testSentenceArr = null;
+/**********************测试***************************/
 
+//训练数据
+var barrageFileArr4Train = [];
+barragePreProcessUtil.traversalXmlInDir('./barragefile/train/', function(path){
+    barrageFileArr4Train.push(path);
+});
+//测试数据
+var barrageFileArr4Test = [];
+barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
+    barrageFileArr4Test.push(path);
+});
 
 //第一步：弹幕主客观分类，写入barrageClassifyResult.json
-var sentimentalClassifierObj = {
-    subjectiveBarrageArr : [],
-    objectiveBarrageArr : []
-};
 
-for(var index in barrageFileArr){
-    testSentenceArr = preProcess( barrageFileArr[index] );
+    //4train
+    var sentenceArr4Train = null;
+    var sentimentalClassifierObj4Train = {
+        subjectiveBarrageArr : [],
+        objectiveBarrageArr : []
+    };
 
-
-
-    for(var i in testSentenceArr){
-        SubjSentenceRecognition(testSentenceArr[i].content, sentimentalClassifierObj);
+    for(var index in barrageFileArr4Train){
+        sentenceArr4Train = preProcess(barrageFileArr4Train[index]);
+        for(var i in sentenceArr4Train){
+            SubjSentenceRecognition(sentenceArr4Train[i].content, sentimentalClassifierObj4Train);
+        }
     }
-    
 
-}
+    //4test
+    var sentenceArr4Test = null;
+    var sentimentalClassifierObj4Test = {
+        subjectiveBarrageArr : [],
+        objectiveBarrageArr : []
+    };
+
+    for(var index in barrageFileArr4Test){
+        sentenceArr4Test = preProcess(barrageFileArr4Test[index]);
+        for(var i in sentenceArr4Test){
+            SubjSentenceRecognition(sentenceArr4Test[i].content, sentimentalClassifierObj4Test);
+        }
+    }
+
 
 //第二步：对主观弹幕做情感向量分析
-    
-var subjectiveBarrageArrLen = sentimentalClassifierObj.subjectiveBarrageArr.length;
-// var totalSentimentalValue = 0;
-for(var i in sentimentalClassifierObj.subjectiveBarrageArr){
 
-    var sentimentalValue = 0;
-    var sentence = sentimentalClassifierObj.subjectiveBarrageArr[i].content;
-    var sentencePosTagArr = [];
+    //4train
+    for(var i in sentimentalClassifierObj4Train.subjectiveBarrageArr){
 
-    sentimentalValue = sentimentalAnalyse( sentence );
-    sentimentalClassifierObj.subjectiveBarrageArr[i].sentScore = sentimentalValue;
-    sentencePosTagArr = nodejieba.tag( sentence );
-    sentimentalClassifierObj.subjectiveBarrageArr[i].PosTagArr = sentencePosTagArr;
-    // totalSentimentalValue += sentimentalValue.score;
-}
-// var avgSentimentalValue = totalSentimentalValue/subjectiveBarrageArrLen;
-var sentimentalClassifierJSON = JSON.stringify(sentimentalClassifierObj, null, 2);
-fs.writeFileSync('./barrageClassifyResult.json', sentimentalClassifierJSON);
+        var sentimentalValue = 0;
+        var sentence = sentimentalClassifierObj4Train.subjectiveBarrageArr[i].content;
+        var sentencePosTagArr = [];
+
+        sentimentalValue = sentimentalAnalyse( sentence );
+        sentimentalClassifierObj4Train.subjectiveBarrageArr[i].sentScore = sentimentalValue;
+        sentencePosTagArr = nodejieba.tag( sentence );
+        sentimentalClassifierObj4Train.subjectiveBarrageArr[i].PosTagArr = sentencePosTagArr;
+    }
+    //4test
+    for(var i in sentimentalClassifierObj4Test.subjectiveBarrageArr){
+
+        var sentimentalValue = 0;
+        var sentence = sentimentalClassifierObj4Test.subjectiveBarrageArr[i].content;
+        var sentencePosTagArr = [];
+
+        sentimentalValue = sentimentalAnalyse( sentence );
+        sentimentalClassifierObj4Test.subjectiveBarrageArr[i].sentScore = sentimentalValue;
+        sentencePosTagArr = nodejieba.tag( sentence );
+        sentimentalClassifierObj4Test.subjectiveBarrageArr[i].PosTagArr = sentencePosTagArr;
+    }
+
+//写入预处理json文件中
+
+    //4train
+    var sentimentalClassifierJSON4Train = JSON.stringify(sentimentalClassifierObj4Train, null, 2);
+    fs.writeFileSync('./barragePreProcess4Train.json', sentimentalClassifierJSON4Train);
+    //4test
+    var sentimentalClassifierJSON4Test = JSON.stringify(sentimentalClassifierObj4Test, null, 2);
+    fs.writeFileSync('./barragePreProcess4Test.json', sentimentalClassifierJSON4Test);
+
+
+
+
+
+
 
 
 //第三步：对客观弹幕做高频词排名
-// var objectiveBarrageArr = sentimentalClassifierObj.objectiveBarrageArr;
+// var objectiveBarrageArr = sentimentalClassifierObj4Train.objectiveBarrageArr;
 // var objectiveKeywordsArr = {};
 // for(var i in objectiveBarrageArr){
 //     var keywords = barragePreProcessUtil.extractKeywords(objectiveBarrageArr[i],3);

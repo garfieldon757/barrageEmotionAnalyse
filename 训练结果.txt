@@ -1,0 +1,128 @@
+四个基本特征+2，3gram特征：
+
+training report: {
+sentimentClassifier.js:17324
+	accuracy: 0.9140401146131805,
+	fscore: 0.803921568627451,
+	recall: 0.7151162790697675,
+	precision: 0.9131205673758865,
+	class: {
+		'1': {
+			precision: 0.9131205673758865,
+			recall: 0.9790874524714829,
+			fscore: 0.944954128440367,
+			size: 526
+		},
+		'-1': {
+			precision: 0.917910447761194,
+			recall: 0.7151162790697675,
+			fscore: 0.803921568627451,
+			size: 172
+		}
+	},
+	size: 698,
+	reduce: true,
+	retainedVariance: 1,
+	retainedDimension: 6,
+	initialDimension: 6
+}
+Predictions:
+预测总数：874
+sentimentClassifier.js:17334
+预测准确率：0.9210526315789473
+
+2，3gram特征：
+training report: {
+sentimentClassifier.js:11036
+	accuracy: 0.7535816618911175,
+	fscore: 0,
+	recall: 0,
+	precision: 0,
+	class: {
+		'1': {
+			precision: 0.7535816618911175,
+			recall: 1,
+			fscore: 0.8594771241830066,
+			size: 526
+		},
+		'-1': {
+			precision: 0,
+			recall: 0,
+			fscore: 0,
+			size: 172
+		}
+	},
+	size: 698,
+	reduce: true,
+	retainedVariance: 1,
+	retainedDimension: 2,
+	initialDimension: 2
+}
+Predictions:
+预测总数：874
+sentimentClassifier.js:11046
+预测准确率：0.7185354691075515
+
+仅3gram特征：
+training report: {
+sentimentClassifier.js:11036
+	accuracy: 0.7535816618911175,
+	fscore: 0,
+	recall: 0,
+	precision: 0,
+	class: {
+		'1': {
+			precision: 0.7535816618911175,
+			recall: 1,
+			fscore: 0.8594771241830066,
+			size: 526
+		},
+		'-1': {
+			precision: 0,
+			recall: 0,
+			fscore: 0,
+			size: 172
+		}
+	},
+	size: 698,
+	reduce: true,
+	retainedVariance: 1,
+	retainedDimension: 2,
+	initialDimension: 2
+}
+Predictions:
+预测总数：874
+sentimentClassifier.js:11046
+预测准确率：0.7185354691075515
+
+仅2gram特征：
+training report: {
+sentimentClassifier.js:9464
+	accuracy: 0.7535816618911175,
+	fscore: 0,
+	recall: 0,
+	precision: 0,
+	class: {
+		'1': {
+			precision: 0.7535816618911175,
+			recall: 1,
+			fscore: 0.8594771241830066,
+			size: 526
+		},
+		'-1': {
+			precision: 0,
+			recall: 0,
+			fscore: 0,
+			size: 172
+		}
+	},
+	size: 698,
+	reduce: true,
+	retainedVariance: 1,
+	retainedDimension: 1,
+	initialDimension: 1
+}
+Predictions:
+预测总数：874
+sentimentClassifier.js:9474
+预测准确率：0.7185354691075515
