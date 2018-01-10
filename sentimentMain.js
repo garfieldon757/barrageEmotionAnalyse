@@ -56,7 +56,7 @@ var barragePreProcessUtil = {
 
         //计算平均每秒弹幕数量
         var videoLen = Number.parseInt(barrageArr[barrageArr.length - 1].timeStamp);
-        var avgBarrageNum = barrageArr.length / videoLen;
+        var avgBarrageNum = (barrageArr.length / videoLen)*3;
         //新建每秒弹幕数量arr
         var barrageNumArr = [];
         var numPerSecObj = {};
@@ -281,7 +281,7 @@ function preProcess(barrageFilePath){
 };
 
 //主客观弹幕分类
-function SubjSentenceRecognition(sentence, resultObj){
+function SubjSentenceRecognition(sentence, timeStamp, resultObj){
     
     //定义词典obj格式 -> 获取词典数据
     var dicObj = {}; 
@@ -294,7 +294,9 @@ function SubjSentenceRecognition(sentence, resultObj){
     //根据情感值对主客观弹幕分类
     var sentenceObj = {};
     sentenceObj.content = sentence;
-    if(sentenceSentimentScore.score != 0){
+    sentenceObj.timeStamp = timeStamp;
+
+    if( Math.abs(sentenceSentimentScore.score) >= 1){
         resultObj.subjectiveBarrageArr.push(sentenceObj);
     }else{
         resultObj.objectiveBarrageArr.push(sentenceObj);
@@ -344,10 +346,11 @@ barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
     for(var index in barrageFileArr4Train){
         sentenceArr4Train = preProcess(barrageFileArr4Train[index]);
         for(var i in sentenceArr4Train){
-            SubjSentenceRecognition(sentenceArr4Train[i].content, sentimentalClassifierObj4Train);
+            SubjSentenceRecognition(sentenceArr4Train[i].content, sentenceArr4Train[i].timeStamp, sentimentalClassifierObj4Train);
         }
     }
-
+    console.log("1-1");
+    
     //4test
     var sentenceArr4Test = null;
     var sentimentalClassifierObj4Test = {
@@ -358,13 +361,13 @@ barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
     for(var index in barrageFileArr4Test){
         sentenceArr4Test = preProcess(barrageFileArr4Test[index]);
         for(var i in sentenceArr4Test){
-            SubjSentenceRecognition(sentenceArr4Test[i].content, sentimentalClassifierObj4Test);
+            SubjSentenceRecognition(sentenceArr4Test[i].content, sentenceArr4Test[i].timeStamp, sentimentalClassifierObj4Test);
         }
     }
-
+    console.log("1-2");
 
 //第二步：对主观弹幕做情感向量分析
-
+    
     //4train
     for(var i in sentimentalClassifierObj4Train.subjectiveBarrageArr){
 
@@ -377,6 +380,7 @@ barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
         sentencePosTagArr = nodejieba.tag( sentence );
         sentimentalClassifierObj4Train.subjectiveBarrageArr[i].PosTagArr = sentencePosTagArr;
     }
+    console.log("2-1");
     //4test
     for(var i in sentimentalClassifierObj4Test.subjectiveBarrageArr){
 
@@ -389,7 +393,7 @@ barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
         sentencePosTagArr = nodejieba.tag( sentence );
         sentimentalClassifierObj4Test.subjectiveBarrageArr[i].PosTagArr = sentencePosTagArr;
     }
-
+    console.log("2-2");
 //写入预处理json文件中
 
     //4train
@@ -398,15 +402,79 @@ barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
     //4test
     var sentimentalClassifierJSON4Test = JSON.stringify(sentimentalClassifierObj4Test, null, 2);
     fs.writeFileSync('./barragePreProcess4Test.json', sentimentalClassifierJSON4Test);
+    console.log("3");
+
+
+/*********************** 对客观弹幕做处理 ***************************/
+
+// 1.弹幕预处理加上时间戳属性 done.
+// 2.使用弹幕高潮区间获取API done.
+// 3.提取特定弹幕高潮区间的主客观弹幕，构造对象合集 done.
+// 4.对主观弹幕用模型预测情感倾向；
+// 5.对客观弹幕做关键词提取；
+// 6.4和5进行映射，并写入到一个新建的未登录词情感词典中；
+
+
+
+var sentimentalClassifierObj = {
+    subjectiveBarrageArr : [],
+    objectiveBarrageArr : []
+};
+
+//所有弹幕文件的弹幕密集区域obj统一存放在hotTimezone_sentimentalClassifierArr数组中
+var hotTimezone_sentimentalClassifierArr = [];
+for(var k in barrageFileArr4Train){
+
+    var testBarrageFilePath = barrageFileArr4Train[k];
+    var sentenceArr = preProcess(testBarrageFilePath);
+
+
+    //3.1 使用弹幕高潮区间获取API
+    var hotTimezoneArr = barragePreProcessUtil.recongnizeHotTimezone(sentenceArr);
+
+    //3.2 提取特定弹幕高潮区间的主客观弹幕，构造对象合集 
+    var hotTimezoneBarragesArr = [];
+    for(var i=0; i<hotTimezoneArr.length; i++){
+        //根据热点区域下标获取一个时间段内的弹幕 
+        var startTimeStamp = hotTimezoneArr[i].startTimeStamp;
+        var endTimeStamp   = hotTimezoneArr[i].endTimeStamp;
+        var hotTimezoneBarrages = [];
+        for(var j=0; j<sentenceArr.length; j++){
+            if( Number.parseFloat(sentenceArr[j].timeStamp) > startTimeStamp &&
+                Number.parseFloat(sentenceArr[j].timeStamp) < endTimeStamp  ){
+                    hotTimezoneBarrages.push(sentenceArr[j]);
+            }
+        }
+        hotTimezoneBarragesArr.push(hotTimezoneBarrages);
+    }
+
+    
+    for(var i in hotTimezoneBarragesArr){
+        var hotTimezone_sentenceArr = hotTimezoneBarragesArr[i];
+        var hotTimezone_sentimentalClassifierObj = {
+            subjectiveBarrageArr : [],
+            objectiveBarrageArr : []
+        }
+        for(var j in hotTimezone_sentenceArr){
+            SubjSentenceRecognition(hotTimezone_sentenceArr[j].content, hotTimezone_sentenceArr[j].timeStamp, hotTimezone_sentimentalClassifierObj);
+        }
+        hotTimezone_sentimentalClassifierArr.push(hotTimezone_sentimentalClassifierObj);
+    }
+    console.log("..");
+}
+
+for(var i in hotTimezone_sentimentalClassifierArr){
+
+    // 3.3 对主观弹幕用模型预测情感倾向；
+    // var subjectiveBarrageArr = 
+
+    // 3.4 对客观弹幕做关键词提取；
+
+}
 
 
 
 
-
-
-
-
-//第三步：对客观弹幕做高频词排名
 // var objectiveBarrageArr = sentimentalClassifierObj4Train.objectiveBarrageArr;
 // var objectiveKeywordsArr = {};
 // for(var i in objectiveBarrageArr){
