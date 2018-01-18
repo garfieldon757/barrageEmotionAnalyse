@@ -25,3 +25,4 @@ var stage3 = require('./modelTrain');
 
 
 /*********************** 对客观弹幕做处理 ***************************/
+var objectiveBarrageProcess = require('./objectiveSentimentProcess');

@@ -25,6 +25,17 @@ var sentimentalClassifierObj = {
     objectiveBarrageArr : []
 };
 
+//训练数据
+var barrageFileArr4Train = [];
+barragePreProcessUtil.traversalXmlInDir('./barragefile/train/', function(path){
+    barrageFileArr4Train.push(path);
+});
+//测试数据
+var barrageFileArr4Test = [];
+barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
+    barrageFileArr4Test.push(path);
+});
+
 //所有弹幕文件的弹幕密集区域obj统一存放在hotTimezone_sentimentalClassifierArr数组中
 var hotTimezone_sentimentalClassifierArr = [];
 for(var k in barrageFileArr4Train){
@@ -70,7 +81,14 @@ for(var k in barrageFileArr4Train){
 for(var i in hotTimezone_sentimentalClassifierArr){
 
     // 3.3 对主观弹幕用模型预测情感倾向；
-    // var subjectiveBarrageArr = 
+    var subjectiveBarrageArr = hotTimezone_sentimentalClassifierArr[i].subjectiveBarrageArr;
+    var sentimentalScore=0,
+        subjectiveBarrageArrLen = subjectiveBarrageArr.length;
+    for(var i in subjectiveBarrageArr){
+        //积极弹幕1.转向量；2.放入模型预测；3.计算整体平均情感倾向。
+        ...
+    }
+        
 
     // 3.4 对客观弹幕做关键词提取；
     var objectiveBarrageArr = hotTimezone_sentimentalClassifierArr[i].objectiveBarrageArr;
