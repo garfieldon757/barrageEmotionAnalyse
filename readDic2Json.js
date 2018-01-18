@@ -14,22 +14,22 @@
 
     //读取词典
     var lineReader_posSentiment = rd.createInterface({
-        input : fs.createReadStream('./dic/正面情感词语（中文）.txt')
+        input : fs.createReadStream('./sentimentalDic/dic/正面情感词语（中文）.txt')
     });
     var lineReader_negSentiment = rd.createInterface({
-        input : fs.createReadStream('./dic/负面情感词语（中文）.txt')
+        input : fs.createReadStream('./sentimentalDic/dic/负面情感词语（中文）.txt')
     });
     var lineReader_posEvaluate = rd.createInterface({
-        input : fs.createReadStream('./dic/正面评价词语（中文）.txt')
+        input : fs.createReadStream('./sentimentalDic/dic/正面评价词语（中文）.txt')
     });
     var lineReader_negEvaluate = rd.createInterface({
-        input : fs.createReadStream('./dic/负面评价词语（中文）.txt')
+        input : fs.createReadStream('./sentimentalDic/dic/负面评价词语（中文）.txt')
     });
     var lineReader_deny = rd.createInterface({
-        input : fs.createReadStream('./dic/否定词语（中文）.txt')
+        input : fs.createReadStream('./sentimentalDic/dic/否定词语（中文）.txt')
     });
     var lineReader_level = rd.createInterface({
-        input : fs.createReadStream('./dic/程度级别词语（中文）.txt')
+        input : fs.createReadStream('./sentimentalDic/dic/程度级别词语（中文）.txt')
     });
 
     lineReader_posSentiment.on('line', function(line){
@@ -89,6 +89,6 @@
     setTimeout(function(){
         //obj的格式存入sentDic.json文件中，供随后调用
         var dicJSON = JSON.stringify(dicObj);
-        fs.writeFileSync('./sentDic.json', dicJSON);
+        fs.writeFileSync('./sentimentalDic/sentDic.json', dicJSON);
     }, 1000);
 
