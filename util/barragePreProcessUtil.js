@@ -1,5 +1,6 @@
     var fs = require('fs'),
-        path = require('path');
+        path = require('path'),
+        nodejieba = require('nodejieba');
 
 
     var cutWords = function(sentence){

@@ -3,7 +3,6 @@
  */
 var svm = require('node-svm');
 var fs  = require('fs');
-var so = require('stringify-object');
 
 //载入训练好的情感分类模型
 var modelJSON = fs.readFileSync('./tempData/modelJSON.json', 'utf8');

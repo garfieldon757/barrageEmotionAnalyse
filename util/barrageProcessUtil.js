@@ -32,8 +32,9 @@ function preProcess(barrageFilePath){
 };
 
 //主客观弹幕分类
-function SubjSentenceRecognition(sentence, timeStamp, resultObj){
+function SubjSentenceRecognition(sentence, timeStamp, resultObj, PosTagArr){
     
+
     //定义词典obj格式 -> 获取词典数据
     var dicObj = {}; 
     dicObj = sentimentalAnalyseUtil.readDicFromObj('./sentimentalDic/sentDic.json');
@@ -46,6 +47,7 @@ function SubjSentenceRecognition(sentence, timeStamp, resultObj){
     var sentenceObj = {};
     sentenceObj.content = sentence;
     sentenceObj.timeStamp = timeStamp;
+    sentenceObj.PosTagArr = PosTagArr;
 
     if( Math.abs(sentenceSentimentScore.score) >= 1){
         resultObj.subjectiveBarrageArr.push(sentenceObj);

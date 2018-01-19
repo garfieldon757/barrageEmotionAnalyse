@@ -126,18 +126,18 @@ for(var i in subjectiveBarrageArr){
     var barrage = subjectiveBarrageArr[i];
 
     featureArr.push(barrage.sentWordObj.polarity);
-    // featureArr.push(barrage.degreeWordObj.flag);
-    // featureArr.push(barrage.denyWordObj.flag);
-    // featureArr.push(barrage.punctuationObj.index);
+    featureArr.push(barrage.degreeWordObj.flag);
+    featureArr.push(barrage.denyWordObj.flag);
+    featureArr.push(barrage.punctuationObj.index);
     //2-ngram特征合并成一个数值
     var ngram2_1 = parseInt(barrage.ngram2[0]);
     var ngram2_2 = parseInt(barrage.ngram2[1]);
-    // featureArr.push(ngram2_1*100+ngram2_2);
+    featureArr.push(ngram2_1*100+ngram2_2);
     //3-ngram特征合并成一个数值
     var ngram3_1 = parseInt(barrage.ngram3[0]);
     var ngram3_2 = parseInt(barrage.ngram3[1]);
     var ngram3_3 = parseInt(barrage.ngram3[2]);
-    // featureArr.push(ngram3_1*10000+ngram3_2*100+ngram3_3);
+    featureArr.push(ngram3_1*10000+ngram3_2*100+ngram3_3);
 
     if(barrage.sentScore > 0)
         classResult = 1;//-1-'negtive'  1-'positive'
