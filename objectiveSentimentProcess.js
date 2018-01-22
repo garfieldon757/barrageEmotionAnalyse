@@ -13,6 +13,7 @@
 var svm = require('node-svm');
 var fs  = require('fs'),
     nodejieba = require("nodejieba");
+var barrageProcessUtil = require('./util/barrageProcessUtil');
 
 var barragePreProcessUtil = require('./util/barragePreProcessUtil');//弹幕预处理api库
 var sentimentalAnalyseUtil = require('./util/sentimentalAnalyseUtil');//情感分析基础api库
@@ -81,7 +82,7 @@ for(var k in barrageFileArr4Test){
         }
         hotTimezone_sentimentalClassifierArr.push(hotTimezone_sentimentalClassifierObj);
     }
-    console.log("..");
+    
 }
 
 for(var i in hotTimezone_sentimentalClassifierArr){
@@ -161,23 +162,25 @@ for(var i in hotTimezone_sentimentalClassifierArr){
             continue;
         }else if(objectiveBarrageArr[j].content == objectiveBarrageArr[j-1].content){
             objectiveBarrage_count++;
-            objectiveBarrage_maxCount_index = j;
             continue;
         }else{
             if( objectiveBarrage_count > objectiveBarrage_maxCount){
                 objectiveBarrage_maxCount_index = j-1;
                 objectiveBarrage_maxCount = objectiveBarrage_count;
-                objectiveBarrage_count = 1;
             }
+            objectiveBarrage_count = 1;
         }
     }
     
     
     //3.5 客观词和主观预测结果映射，存入文件
     if(objectiveBarrage_maxCount_index != -1 && objectiveBarrage_maxCount >=3)
-        console.log("第"+ i + "组的客观弹幕关键词是："+ objectiveBarrageArr[objectiveBarrage_maxCount_index].content + "。他的预测情感倾向是：" + sentimentalResult );
+        console.log("第"+ i + "组的客观弹幕关键词是："+ objectiveBarrageArr[objectiveBarrage_maxCount_index].content + "。他的预测情感倾向是：" + sentimentalResult + "  区间出现次数：" + objectiveBarrage_maxCount + "次" );
     
     
 }
 
 console.log("complete!");
+
+var resultStr = barrageProcessUtil.objectiveSententceLikewiseTrim("我是猪我是头猪猪猪猪我是猪我是头猪猪我是头猪猪猪");
+console.log(resultStr);

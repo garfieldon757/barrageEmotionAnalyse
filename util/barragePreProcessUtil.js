@@ -53,20 +53,21 @@
 
         //计算平均每秒弹幕数量
         var videoLen = Number.parseInt(barrageArr[barrageArr.length - 1].timeStamp);
-        var avgBarrageNum = (barrageArr.length / videoLen)*3;
+        var avgBarrageNum = (barrageArr.length / videoLen)*1;
         //新建每秒弹幕数量arr
         var barrageNumArr = [];
         var numPerSecObj = {};
         function numPerSecInit(){
             return {
                 timeStamp : 0,
-                num : 0
+                num : 0,
+                barragesPerSecArr : []
             };
         };
         for(var i in barrageArr){
             if(i==0){
                 numPerSecObj = new numPerSecInit();
-                numPerSecObj.timeStamp = 0
+                numPerSecObj.timeStamp = 0;
                 numPerSecObj.num += 1;
             }else{
                 if( Number.parseInt(barrageArr[i].timeStamp)==Number.parseInt(barrageArr[i-1].timeStamp)){
@@ -79,6 +80,7 @@
                     numPerSecObj.num = 1;
                 }
             }
+            numPerSecObj.barragesPerSecArr.push(barrageArr[i].content);
             
         }
         //识别弹幕数量高于平均弹幕数的区间
@@ -87,7 +89,8 @@
             return {
                 startTimeStamp : 0,
                 endTimeStamp : 0,
-                num : 0
+                num : 0,
+                barragesPerHotZoneArr : []
             };
         }
         var hotTimezone = {},
@@ -98,8 +101,10 @@
                 hotTimezone = new hotTimezoneInit();
                 hotTimezone.startTimeStamp = Number.parseInt(i);
                 hotTimezone.num += barrageNumArr[i].num;
+                hotTimezone.barragesPerHotZoneArr = hotTimezone.barragesPerHotZoneArr.concat(barrageNumArr[i].barragesPerSecArr);
             }else if(barrageNumArr[i].num>avgBarrageNum && newTimezoneFlag){
                 hotTimezone.num += barrageNumArr[i].num;
+                hotTimezone.barragesPerHotZoneArr = hotTimezone.barragesPerHotZoneArr.concat(barrageNumArr[i].barragesPerSecArr);
             }else if(barrageNumArr[i].num<avgBarrageNum && newTimezoneFlag){
                 newTimezoneFlag = false;
                 hotTimezone.endTimeStamp = Number.parseInt(i);

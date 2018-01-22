@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/sentimentMain.js"
+            "program": "${workspaceFolder}/objectiveSentimentProcess.js"
         }
     ]
 }
