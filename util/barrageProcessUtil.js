@@ -81,22 +81,8 @@ function objectiveSententceLikewiseTrim(sentence){
     var dicObj = JSON.parse(dicStr);
     var punctuationArr = dicObj.punctuationArr;
 
-    var newSentence = '';
-    for(var i in sentence){
-
-        var tempWord = sentence[i];
-
-        //标点符号检测
-        var punctFlag = false;
-        for(var j in punctuationArr){
-            if(tempWord == punctuationArr[j]){
-                punctFlag = true;
-                break;
-            }
-        }
-        if(!punctFlag){
-            newSentence = newSentence.concat(sentence[i]);
-        }
+    for(var i in punctuationArr){
+        sentence = sentence.replace(punctuationArr[i], "");
     }
 
     //重复语句检测(利用后缀数组法来检测重复的子字符串)
@@ -107,25 +93,23 @@ function objectiveSententceLikewiseTrim(sentence){
         suffixArr.push(tempArr);
     }
     //2.后缀数组排序
-    // var suffixArr = ['我','是','不是','我是猪','不是猪'];
-    suffixArr = suffixArr.sort(function(firstArr, nextArr){
-        if(firstArr[0] < nextArr[0])
-            return false;
-        else
-            return true;
-    });
+    // var suffixArr = ['金坷垃 ','坷垃 ','垃 ',' '];
+    suffixArr = suffixArr.sort();
     //3.子字符串匹配
     var maxSubStr = '';
-    for(var j=0; j<suffixArr.length-1; j++){
-        var tempStr1 = suffixArr[j]; 
-        var tempStr2 = suffixArr[j+1];
+    for(var j=0; j<suffixArr.length; j++){
+
+        if(suffixArr[j][0] != sentence[0])
+            continue;
+
+        var tempStr1 = suffixArr[j];
         var tempStrIndex = 0;
 
-        while(tempStr1[tempStrIndex] == tempStr2[tempStrIndex]){
+        while(tempStr1[tempStrIndex] == sentence[tempStrIndex] && (tempStrIndex<tempStr1.length) ){
             tempStrIndex++;
         }
 
-        if( (tempStrIndex+1)>maxSubStr.length ){
+        if( (maxSubStr.length!=0 && (tempStrIndex+1)<maxSubStr.length) || maxSubStr.length == 0 ){
             maxSubStr = tempStr1.slice(0, tempStrIndex+1);
         }
     }

@@ -43,6 +43,10 @@ barragePreProcessUtil.traversalXmlInDir('./barragefile/test/', function(path){
 
 //所有弹幕文件的弹幕密集区域obj统一存放在hotTimezone_sentimentalClassifierArr数组中
 var hotTimezone_sentimentalClassifierArr = [];
+var objectiveBarragesObj = {
+    sentimentPosPhraseArr : [],
+    sentimentNegPhraseArr : []
+};
 for(var k in barrageFileArr4Test){
 
     var testBarrageFilePath = barrageFileArr4Test[k];
@@ -174,13 +178,30 @@ for(var i in hotTimezone_sentimentalClassifierArr){
     
     
     //3.5 客观词和主观预测结果映射，存入文件
-    if(objectiveBarrage_maxCount_index != -1 && objectiveBarrage_maxCount >=3)
-        console.log("第"+ i + "组的客观弹幕关键词是："+ objectiveBarrageArr[objectiveBarrage_maxCount_index].content + "。他的预测情感倾向是：" + sentimentalResult + "  区间出现次数：" + objectiveBarrage_maxCount + "次" );
+    if(objectiveBarrage_maxCount_index != -1 && objectiveBarrage_maxCount >=3){
+        var objectiveBarrageObjPhrase = barrageProcessUtil.objectiveSententceLikewiseTrim(objectiveBarrageArr[objectiveBarrage_maxCount_index].content);
+        console.log("第"+ i + "组的客观弹幕关键词是："+ objectiveBarrageArr[objectiveBarrage_maxCount_index].content + " ;处理后： " + objectiveBarrageObjPhrase + "。他的预测情感倾向是：" + sentimentalResult + "  区间出现次数：" + objectiveBarrage_maxCount + "次" );
     
-    
+    //4 客观词短语和存入弹幕领域词库
+    var objectiveBarrageObj = {
+        phrase : objectiveBarrageObjPhrase,
+        sentimentClass : sentimentalResult
+    };
+    if(objectiveBarrageObj.sentimentClass > 0)
+        objectiveBarragesObj.sentimentPosArr.push(objectiveBarrageObj);
+    else
+        objectiveBarragesObj.sentimentNegArr.push(objectiveBarrageObj);
+
 }
 
-console.log("complete!");
 
-var resultStr = barrageProcessUtil.objectiveSententceLikewiseTrim("我是猪我是头猪猪猪猪我是猪我是头猪猪我是头猪猪猪");
-console.log(resultStr);
+// var sentDic4Barrage = fs.readFileSync('./sentimentalDic/sentDic4Barrage.json', 'utf8');
+// var sentDic4BarrageObj = JSON.parse(sentDic4Barrage);
+
+// sentDic4BarrageObj.sentimentPosPhraseArr = sentDic4BarrageObj.sentimentPosPhraseArr.concat(objectiveBarragesObj.sentimentPosPhraseArr);
+// sentDic4BarrageObj.sentimentNegPhraseArr = sentDic4BarrageObj.sentimentNegPhraseArr.concat(objectiveBarragesObj.sentimentNegPhraseArr);
+// var sentDic4BarrageJSON = JSON.stringify(sentDic4BarrageObj);
+// fs.writeFileSync('./sentimentalDic/sentDic4Barrage.json', sentDic4BarrageJSON);
+
+
+console.log("complete!");
