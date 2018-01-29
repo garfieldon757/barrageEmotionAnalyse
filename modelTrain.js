@@ -15,11 +15,11 @@ var classifyDataObj4Test = JSON.parse(classifyDataJSON4Test);
 // initialize a new predictor
 var clf = new svm.SVM({
       svmType: 'C_SVC',
-      c: [0.03125, 0.125, 0.5, 2, 8], 
+      c: [0.03125, 0.125, 0.5, 2, 8], //c值是？？
 
       // kernels parameters
       kernelType: 'RBF',  
-      gamma: [0.03125, 0.125, 0.5, 2, 8],
+      gamma: [0.03125, 0.125, 0.5, 2, 8],//gamma是？？
 
       // training options
       kFold: 4,               
